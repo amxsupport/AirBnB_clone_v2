@@ -1,6 +1,26 @@
-<center> <h1>HBNB - The Console</h1> </center>
+<h1 align="center">HBNB - The Console</h1>
+<p align="center">An AirBnB clone.</p>
+
+<p align="center">
+  <img src="https://github.com/amxsupport/AirBnB_clone_v2/blob/master/assets/hbnb_logo.png"
+	    alt="HBnB logo">
+</p>
+
+## Description :house:
 
 This repository contains the initial stage of a student project to build a clone of the AirBnB website. This stage implements a backend interface, or console, to manage program data. Console commands allow the user to create, update, and destroy objects, as well as manage file storage. Using a system of JSON serialization/deserialization, storage is persistent between sessions.
+
+HBnB is still in active development, with complete functionality set to
+deploy in the coming month:
+
+* Complete integration of a RESTful API
+* Full configuration of website with domain name
+* Serving of dynamic content using JavaScript
+
+<p align="center">
+  <img src="https://github.com/amxsupport/AirBnB_clone_v2/blob/master/assets/hbnb_stack.png"
+	    alt="HBnB stack">
+</p>
 
 ---
 
