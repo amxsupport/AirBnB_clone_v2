@@ -2,7 +2,7 @@
 <p align="center">An AirBnB clone.</p>
 
 <p align="center">
-  <img src="https://github.com/amxsupport/AirBnB_clone_v2/blob/master/assets/hbnb_logo.png"
+  <img src="https://github.com/amxsupport/AirBnB_clone_v2/blob/master/assets/Hbnb-logo.png"
 	    alt="HBnB logo">
 </p>
 
