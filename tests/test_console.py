@@ -205,4 +205,45 @@ class TestHBNBCommand(unittest.TestCase):
             self.assertEqual(
                 "** no instance found **\n", f.getvalue())
 
+    @unittest.skipIf(type(models.storage) == DBStorage, "Testing DBStorage")
+    def test_all(self):
+        """Test all command input."""
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.HBNB.onecmd("all asdfsdfsd")
+            self.assertEqual("** class doesn't exist **\n", f.getvalue())
+        with patch("sys.stdout", new=StringIO()) as f:
+            self.HBNB.onecmd("all State")
+            self.assertEqual("[]\n", f.getvalue())
+
+    @unittest.skipIf(type(models.storage) == DBStorage, "Testing DBStorage")
+    def test_update(self):
+        """Test update command input."""
+        with patch("sys.stdout", new=StringIO()) as f:
+            self.HBNB.onecmd("update")
+            self.assertEqual(
+                "** class name missing **\n", f.getvalue())
+        with patch("sys.stdout", new=StringIO()) as f:
+            self.HBNB.onecmd("update sldkfjsl")
+            self.assertEqual(
+                "** class doesn't exist **\n", f.getvalue())
+        with patch("sys.stdout", new=StringIO()) as f:
+            self.HBNB.onecmd("update User")
+            self.assertEqual(
+                "** instance id missing **\n", f.getvalue())
+        with patch("sys.stdout", new=StringIO()) as f:
+            self.HBNB.onecmd("update User 12345")
+            self.assertEqual(
+                "** no instance found **\n", f.getvalue())
+        with patch("sys.stdout", new=StringIO()) as f:
+            self.HBNB.onecmd("all User")
+            obj = f.getvalue()
+        my_id = obj[obj.find('(')+1:obj.find(')')]
+        with patch("sys.stdout", new=StringIO()) as f:
+            self.HBNB.onecmd("update User " + my_id)
+            self.assertEqual(
+                "** attribute name missing **\n", f.getvalue())
+        with patch("sys.stdout", new=StringIO()) as f:
+            self.HBNB.onecmd("update User " + my_id + " Name")
+            self.assertEqual(
+                "** value missing **\n", f.getvalue())
 
