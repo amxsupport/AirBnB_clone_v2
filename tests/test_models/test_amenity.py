@@ -156,3 +156,18 @@ class TestAmenity(unittest.TestCase):
         self.assertEqual(self.amenity.id, query[0][0])
         cursor.close()
 
+    def test_to_dict(self):
+        """Test to_dict method."""
+        amenity_dict = self.amenity.to_dict()
+        self.assertEqual(dict, type(amenity_dict))
+        self.assertEqual(self.amenity.id, amenity_dict["id"])
+        self.assertEqual("Amenity", amenity_dict["__class__"])
+        self.assertEqual(self.amenity.created_at.isoformat(),
+                         amenity_dict["created_at"])
+        self.assertEqual(self.amenity.updated_at.isoformat(),
+                         amenity_dict["updated_at"])
+        self.assertEqual(self.amenity.name, amenity_dict["name"])
+
+
+if __name__ == "__main__":
+    unittest.main()
