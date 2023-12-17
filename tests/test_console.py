@@ -247,3 +247,36 @@ class TestHBNBCommand(unittest.TestCase):
             self.assertEqual(
                 "** value missing **\n", f.getvalue())
 
+    @unittest.skipIf(type(models.storage) == DBStorage, "Testing DBStorage")
+    def test_z_all(self):
+        """Test alternate all command."""
+        with patch("sys.stdout", new=StringIO()) as f:
+            self.HBNB.onecmd("asdfsdfsd.all()")
+            self.assertEqual(
+                "** class doesn't exist **\n", f.getvalue())
+        with patch("sys.stdout", new=StringIO()) as f:
+            self.HBNB.onecmd("State.all()")
+            self.assertEqual("[]\n", f.getvalue())
+
+    @unittest.skipIf(type(models.storage) == DBStorage, "Testing DBStorage")
+    def test_z_count(self):
+        """Test count command inpout"""
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.HBNB.onecmd("asdfsdfsd.count()")
+            self.assertEqual(
+                "** class doesn't exist **\n", f.getvalue())
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.HBNB.onecmd("State.count()")
+            self.assertEqual("0\n", f.getvalue())
+
+    def test_z_show(self):
+        """Test alternate show command inpout"""
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.HBNB.onecmd("safdsa.show()")
+            self.assertEqual(
+                "** class doesn't exist **\n", f.getvalue())
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.HBNB.onecmd("BaseModel.show(abcd-123)")
+            self.assertEqual(
+                "** no instance found **\n", f.getvalue())
+
