@@ -92,3 +92,38 @@ class TestAmenity(unittest.TestCase):
             self.dbstorage._DBStorage__session.add(Amenity(email="a"))
             self.dbstorage._DBStorage__session.commit()
 
+    def test_is_subclass(self):
+        """Check that Amenity is a subclass of BaseModel."""
+        self.assertTrue(issubclass(Amenity, BaseModel))
+
+    def test_init(self):
+        """Test initialization."""
+        self.assertIsInstance(self.amenity, Amenity)
+
+    def test_two_models_are_unique(self):
+        """Test that different Amenity instances are unique."""
+        us = Amenity(email="a", password="a")
+        self.assertNotEqual(self.amenity.id, us.id)
+        self.assertLess(self.amenity.created_at, us.created_at)
+        self.assertLess(self.amenity.updated_at, us.updated_at)
+
+    def test_init_args_kwargs(self):
+        """Test initialization with args and kwargs."""
+        dt = datetime.utcnow()
+        st = Amenity("1", id="5", created_at=dt.isoformat())
+        self.assertEqual(st.id, "5")
+        self.assertEqual(st.created_at, dt)
+
+    def test_str(self):
+        """Test __str__ representation."""
+        s = self.amenity.__str__()
+        self.assertIn("[Amenity] ({})".format(self.amenity.id), s)
+        self.assertIn("'id': '{}'".format(self.amenity.id), s)
+        self.assertIn("'created_at': {}".format(
+            repr(self.amenity.created_at)), s)
+        self.assertIn("'updated_at': {}".format(
+            repr(self.amenity.updated_at)), s)
+        self.assertIn("'name': '{}'".format(self.amenity.name), s)
+
+    @unittest.skipIf(type(models.storage) == DBStorage,
+                     "Testing DBStorage")
