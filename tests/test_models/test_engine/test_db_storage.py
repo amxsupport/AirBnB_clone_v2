@@ -104,4 +104,36 @@ class TestDBStorage(unittest.TestCase):
         self.assertTrue(hasattr(DBStorage, "delete"))
         self.assertTrue(hasattr(DBStorage, "reload"))
 
+    @unittest.skipIf(type(models.storage) == FileStorage,
+                     "Testing FileStorage")
+    def test_init(self):
+        """Test initialization."""
+        self.assertTrue(isinstance(self.storage, DBStorage))
+
+    @unittest.skipIf(type(models.storage) == FileStorage,
+                     "Testing FileStorage")
+    def test_all(self):
+        """Test default all method."""
+        obj = self.storage.all()
+        self.assertEqual(type(obj), dict)
+        self.assertEqual(len(obj), 6)
+
+    @unittest.skipIf(type(models.storage) == FileStorage,
+                     "Testing FileStorage")
+    def test_all_cls(self):
+        """Test all method with specified cls."""
+        obj = self.storage.all(State)
+        self.assertEqual(type(obj), dict)
+        self.assertEqual(len(obj), 1)
+        self.assertEqual(self.state, list(obj.values())[0])
+
+    @unittest.skipIf(type(models.storage) == FileStorage,
+                     "Testing FileStorage")
+    def test_new(self):
+        """Test new method."""
+        st = State(name="Washington")
+        self.storage.new(st)
+        store = list(self.storage._DBStorage__session.new)
+        self.assertIn(st, store)
+
 
