@@ -94,4 +94,38 @@ class TestReview(unittest.TestCase):
         self.assertTrue(hasattr(us, "place_id"))
         self.assertTrue(hasattr(us, "user_id"))
 
+    @unittest.skipIf(type(models.storage) == FileStorage,
+                     "Testing FileStorage")
+    def test_nullable_attributes(self):
+        """Test that email attribute is non-nullable."""
+        with self.assertRaises(OperationalError):
+            self.dbstorage._DBStorage__session.add(Review(
+                place_id=self.place.id, user_id=self.user.id))
+            self.dbstorage._DBStorage__session.commit()
+        self.dbstorage._DBStorage__session.rollback()
+        with self.assertRaises(OperationalError):
+            self.dbstorage._DBStorage__session.add(Review(
+                text="a", user_id=self.user.id))
+            self.dbstorage._DBStorage__session.commit()
+        self.dbstorage._DBStorage__session.rollback()
+        with self.assertRaises(OperationalError):
+            self.dbstorage._DBStorage__session.add(Review(
+                text="a", place_id=self.place.id))
+            self.dbstorage._DBStorage__session.commit()
+
+    def test_is_subclass(self):
+        """Check that Review is a subclass of BaseModel."""
+        self.assertTrue(issubclass(Review, BaseModel))
+
+    def test_init(self):
+        """Test initialization."""
+        self.assertIsInstance(self.review, Review)
+
+    def test_two_models_are_unique(self):
+        """Test that different Review instances are unique."""
+        us = Review(email="a", password="a")
+        self.assertNotEqual(self.review.id, us.id)
+        self.assertLess(self.review.created_at, us.created_at)
+        self.assertLess(self.review.updated_at, us.updated_at)
+
 
