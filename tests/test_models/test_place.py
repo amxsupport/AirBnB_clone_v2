@@ -105,4 +105,34 @@ class TestPlace(unittest.TestCase):
         self.assertTrue(hasattr(us, "latitude"))
         self.assertTrue(hasattr(us, "longitude"))
 
+    @unittest.skipIf(type(models.storage) == FileStorage,
+                     "Testing FileStorage")
+    def test_nullable_attributes(self):
+        """Test that email attribute is non-nullable."""
+        with self.assertRaises(OperationalError):
+            self.dbstorage._DBStorage__session.add(Place(user_id=self.user.id,
+                                                         name="Betty"))
+            self.dbstorage._DBStorage__session.commit()
+        self.dbstorage._DBStorage__session.rollback()
+        with self.assertRaises(OperationalError):
+            self.dbstorage._DBStorage__session.add(Place(city_id=self.city.id,
+                                                         name="Betty"))
+            self.dbstorage._DBStorage__session.commit()
+        self.dbstorage._DBStorage__session.rollback()
+        with self.assertRaises(OperationalError):
+            self.dbstorage._DBStorage__session.add(Place(city_id=self.city.id,
+                                                         user_id=self.user.id))
+            self.dbstorage._DBStorage__session.commit()
+        self.dbstorage._DBStorage__session.rollback()
+
+    @unittest.skipIf(type(models.storage) == DBStorage,
+                     "Testing DBStorage")
+    def test_reviews_filestorage(self):
+        """Test reviews attribute."""
+        key = "{}.{}".format(type(self.review).__name__, self.review.id)
+        self.filestorage._FileStorage__objects[key] = self.review
+        reviews = self.place.reviews
+        self.assertTrue(list, type(reviews))
+        self.assertIn(self.review, reviews)
+
 
