@@ -104,4 +104,33 @@ class TestState(unittest.TestCase):
         """Check that State is a subclass of BaseModel."""
         self.assertTrue(issubclass(State, BaseModel))
 
+    def test_init(self):
+        """Test initialization."""
+        self.assertIsInstance(self.state, State)
+
+    def test_two_models_are_unique(self):
+        """Test that different State instances are unique."""
+        st = State()
+        self.assertNotEqual(self.state.id, st.id)
+        self.assertLess(self.state.created_at, st.created_at)
+        self.assertLess(self.state.updated_at, st.updated_at)
+
+    def test_init_args_kwargs(self):
+        """Test initialization with args and kwargs."""
+        dt = datetime.utcnow()
+        st = State("1", id="5", created_at=dt.isoformat())
+        self.assertEqual(st.id, "5")
+        self.assertEqual(st.created_at, dt)
+
+    def test_str(self):
+        """Test __str__ representation."""
+        s = self.state.__str__()
+        self.assertIn("[State] ({})".format(self.state.id), s)
+        self.assertIn("'id': '{}'".format(self.state.id), s)
+        self.assertIn("'created_at': {}".format(
+            repr(self.state.created_at)), s)
+        self.assertIn("'updated_at': {}".format(
+            repr(self.state.updated_at)), s)
+        self.assertIn("'name': '{}'".format(self.state.name), s)
+
 
