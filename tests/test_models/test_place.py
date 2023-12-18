@@ -168,4 +168,27 @@ class TestPlace(unittest.TestCase):
         self.assertEqual(st.id, "5")
         self.assertEqual(st.created_at, dt)
 
+    def test_str(self):
+        """Test __str__ representation."""
+        s = self.place.__str__()
+        self.assertIn("[Place] ({})".format(self.place.id), s)
+        self.assertIn("'id': '{}'".format(self.place.id), s)
+        self.assertIn("'created_at': {}".format(
+            repr(self.place.created_at)), s)
+        self.assertIn("'updated_at': {}".format(
+            repr(self.place.updated_at)), s)
+        self.assertIn("'city_id': '{}'".format(self.place.city_id), s)
+        self.assertIn("'user_id': '{}'".format(self.place.user_id), s)
+        self.assertIn("'name': '{}'".format(self.place.name), s)
+
+    @unittest.skipIf(type(models.storage) == DBStorage,
+                     "Testing DBStorage")
+    def test_save_filestorage(self):
+        """Test save method with FileStorage."""
+        old = self.place.updated_at
+        self.place.save()
+        self.assertLess(old, self.place.updated_at)
+        with open("file.json", "r") as f:
+            self.assertIn("Place." + self.place.id, f.read())
+
 
