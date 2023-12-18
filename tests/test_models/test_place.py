@@ -214,4 +214,20 @@ class TestPlace(unittest.TestCase):
         self.assertEqual(self.place.id, query[0][0])
         cursor.close()
 
+    def test_to_dict(self):
+        """Test to_dict method."""
+        place_dict = self.place.to_dict()
+        self.assertEqual(dict, type(place_dict))
+        self.assertEqual(self.place.id, place_dict["id"])
+        self.assertEqual("Place", place_dict["__class__"])
+        self.assertEqual(self.place.created_at.isoformat(),
+                         place_dict["created_at"])
+        self.assertEqual(self.place.updated_at.isoformat(),
+                         place_dict["updated_at"])
+        self.assertEqual(self.place.city_id, place_dict["city_id"])
+        self.assertEqual(self.place.user_id, place_dict["user_id"])
+        self.assertEqual(self.place.name, place_dict["name"])
 
+
+if __name__ == "__main__":
+    unittest.main()
