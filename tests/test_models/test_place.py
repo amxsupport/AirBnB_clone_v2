@@ -51,3 +51,58 @@ class TestPlace(unittest.TestCase):
             Base.metadata.create_all(cls.dbstorage._DBStorage__engine)
             Session = sessionmaker(bind=cls.dbstorage._DBStorage__engine)
             cls.dbstorage._DBStorage__session = Session()
+
+    @classmethod
+    def tearDownClass(cls):
+        """Place testing teardown.
+
+        Restore original file.json.
+        Delete test instances.
+        """
+        try:
+            os.remove("file.json")
+        except IOError:
+            pass
+        try:
+            os.rename("tmp", "file.json")
+        except IOError:
+            pass
+        del cls.state
+        del cls.city
+        del cls.user
+        del cls.place
+        del cls.review
+        del cls.amenity
+        del cls.filestorage
+        if type(models.storage) == DBStorage:
+            cls.dbstorage._DBStorage__session.close()
+            del cls.dbstorage
+
+    def test_pep8(self):
+        """Test pep8 styling."""
+        style = pep8.StyleGuide(quiet=True)
+        p = style.check_files(["models/place.py"])
+        self.assertEqual(p.total_errors, 0, "fix pep8")
+
+    def test_docstrings(self):
+        """Check for docstrings."""
+        self.assertIsNotNone(Place.__doc__)
+
+    def test_attributes(self):
+        """Check for attributes."""
+        us = Place()
+        self.assertEqual(str, type(us.id))
+        self.assertEqual(datetime, type(us.created_at))
+        self.assertEqual(datetime, type(us.updated_at))
+        self.assertTrue(hasattr(us, "__tablename__"))
+        self.assertTrue(hasattr(us, "city_id"))
+        self.assertTrue(hasattr(us, "name"))
+        self.assertTrue(hasattr(us, "description"))
+        self.assertTrue(hasattr(us, "number_rooms"))
+        self.assertTrue(hasattr(us, "number_bathrooms"))
+        self.assertTrue(hasattr(us, "max_guest"))
+        self.assertTrue(hasattr(us, "price_by_night"))
+        self.assertTrue(hasattr(us, "latitude"))
+        self.assertTrue(hasattr(us, "longitude"))
+
+
