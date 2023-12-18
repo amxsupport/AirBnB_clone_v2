@@ -64,3 +64,53 @@ class TestCity(unittest.TestCase):
             cls.dbstorage._DBStorage__session.close()
             del cls.dbstorage
 
+    def test_pep8(self):
+        """Test pep8 styling."""
+        style = pep8.StyleGuide(quiet=True)
+        p = style.check_files(["models/city.py"])
+        self.assertEqual(p.total_errors, 0, "fix pep8")
+
+    def test_docstrings(self):
+        """Check for docstrings."""
+        self.assertIsNotNone(City.__doc__)
+
+    def test_attributes(self):
+        """Check for attributes."""
+        ct = City()
+        self.assertEqual(str, type(ct.id))
+        self.assertEqual(datetime, type(ct.created_at))
+        self.assertEqual(datetime, type(ct.updated_at))
+        self.assertTrue(hasattr(ct, "__tablename__"))
+        self.assertTrue(hasattr(ct, "name"))
+        self.assertTrue(hasattr(ct, "state_id"))
+
+    @unittest.skipIf(type(models.storage) == FileStorage,
+                     "Testing FileStorage")
+    def test_nullable_attributes(self):
+        """Check that relevant DBStorage attributes are non-nullable."""
+        with self.assertRaises(OperationalError):
+            self.dbstorage._DBStorage__session.add(City(
+                state_id=self.state.id))
+            self.dbstorage._DBStorage__session.commit()
+        self.dbstorage._DBStorage__session.rollback()
+        with self.assertRaises(OperationalError):
+            self.dbstorage._DBStorage__session.add(City(name="San Jose"))
+            self.dbstorage._DBStorage__session.commit()
+        self.dbstorage._DBStorage__session.rollback()
+
+    @unittest.skipIf(type(models.storage) == FileStorage,
+                     "Testing FileStorage")
+    def test_state_relationship_deletes(self):
+        """Test delete cascade in City-State relationship."""
+        st = State(name="Georgia")
+        self.dbstorage._DBStorage__session.add(st)
+        self.dbstorage._DBStorage__session.commit()
+        ct = City(name="Atlanta", state_id=st.id)
+        self.dbstorage._DBStorage__session.add(ct)
+        self.dbstorage._DBStorage__session.commit()
+        self.dbstorage._DBStorage__session.delete(st)
+        self.dbstorage._DBStorage__session.commit()
+        db = MySQLdb.connect(user="hbnb_test",
+                             passwd="hbnb_test_pwd",
+                             db="hbnb_test_db")
+
