@@ -185,3 +185,19 @@ class TestCity(unittest.TestCase):
         self.assertEqual(self.city.id, query[0][0])
         cursor.close()
 
+    def test_to_dict(self):
+        """Test to_dict method."""
+        city_dict = self.city.to_dict()
+        self.assertEqual(dict, type(city_dict))
+        self.assertEqual(self.city.id, city_dict["id"])
+        self.assertEqual("City", city_dict["__class__"])
+        self.assertEqual(self.city.created_at.isoformat(),
+                         city_dict["created_at"])
+        self.assertEqual(self.city.updated_at.isoformat(),
+                         city_dict["updated_at"])
+        self.assertEqual(self.city.name, city_dict["name"])
+        self.assertEqual(self.city.state_id, city_dict["state_id"])
+
+
+if __name__ == "__main__":
+    unittest.main()
