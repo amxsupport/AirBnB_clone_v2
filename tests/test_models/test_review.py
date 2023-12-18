@@ -128,4 +128,34 @@ class TestReview(unittest.TestCase):
         self.assertLess(self.review.created_at, us.created_at)
         self.assertLess(self.review.updated_at, us.updated_at)
 
+    def test_init_args_kwargs(self):
+        """Test initialization with args and kwargs."""
+        dt = datetime.utcnow()
+        st = Review("1", id="5", created_at=dt.isoformat())
+        self.assertEqual(st.id, "5")
+        self.assertEqual(st.created_at, dt)
+
+    def test_str(self):
+        """Test __str__ representation."""
+        s = self.review.__str__()
+        self.assertIn("[Review] ({})".format(self.review.id), s)
+        self.assertIn("'id': '{}'".format(self.review.id), s)
+        self.assertIn("'created_at': {}".format(
+            repr(self.review.created_at)), s)
+        self.assertIn("'updated_at': {}".format(
+            repr(self.review.updated_at)), s)
+        self.assertIn("'text': '{}'".format(self.review.text), s)
+        self.assertIn("'place_id': '{}'".format(self.review.place_id), s)
+        self.assertIn("'user_id': '{}'".format(self.review.user_id), s)
+
+    @unittest.skipIf(type(models.storage) == DBStorage,
+                     "Testing DBStorage")
+    def test_save_filestorage(self):
+        """Test save method with FileStorage."""
+        old = self.review.updated_at
+        self.review.save()
+        self.assertLess(old, self.review.updated_at)
+        with open("file.json", "r") as f:
+            self.assertIn("Review." + self.review.id, f.read())
+
 
