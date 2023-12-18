@@ -114,3 +114,43 @@ class TestCity(unittest.TestCase):
                              passwd="hbnb_test_pwd",
                              db="hbnb_test_db")
 
+        cursor = db.cursor()
+        cursor.execute("SELECT * FROM cities WHERE BINARY name = 'Atlanta'")
+        query = cursor.fetchall()
+        cursor.close()
+        self.assertEqual(0, len(query))
+
+    def test_is_subclass(self):
+        """Check that City is a subclass of BaseModel."""
+        self.assertTrue(issubclass(City, BaseModel))
+
+    def test_init(self):
+        """Test initialization."""
+        self.assertIsInstance(self.city, City)
+
+    def test_two_models_are_unique(self):
+        """Test that different City instances are unique."""
+        ct = City()
+        self.assertNotEqual(self.city.id, ct.id)
+        self.assertLess(self.city.created_at, ct.created_at)
+        self.assertLess(self.city.updated_at, ct.updated_at)
+
+    def test_init_args_kwargs(self):
+        """Test initialization with args and kwargs."""
+        dt = datetime.utcnow()
+        ct = City("1", id="5", created_at=dt.isoformat())
+        self.assertEqual(ct.id, "5")
+        self.assertEqual(ct.created_at, dt)
+
+    def test_str(self):
+        """Test __str__ representation."""
+        s = self.city.__str__()
+        self.assertIn("[City] ({})".format(self.city.id), s)
+        self.assertIn("'id': '{}'".format(self.city.id), s)
+        self.assertIn("'created_at': {}".format(
+            repr(self.city.created_at)), s)
+        self.assertIn("'updated_at': {}".format(
+            repr(self.city.updated_at)), s)
+        self.assertIn("'name': '{}'".format(self.city.name), s)
+        self.assertIn("'state_id': '{}'".format(self.city.state_id), s)
+
