@@ -41,3 +41,36 @@ class TestState(unittest.TestCase):
             Session = sessionmaker(bind=cls.dbstorage._DBStorage__engine)
             cls.dbstorage._DBStorage__session = Session()
 
+    @classmethod
+    def tearDownClass(cls):
+        """State testing teardown.
+
+        Restore original file.json.
+        Delete the FileStorage, DBStorage and State test instances.
+        """
+        try:
+            os.remove("file.json")
+        except IOError:
+            pass
+        try:
+            os.rename("tmp", "file.json")
+        except IOError:
+            pass
+        del cls.state
+        del cls.city
+        del cls.filestorage
+        if type(models.storage) == DBStorage:
+            cls.dbstorage._DBStorage__session.close()
+            del cls.dbstorage
+
+    def test_pep8(self):
+        """Test pep8 styling."""
+        style = pep8.StyleGuide(quiet=True)
+        p = style.check_files(["models/state.py"])
+        self.assertEqual(p.total_errors, 0, "fix pep8")
+
+    def test_docstrings(self):
+        """Check for docstrings."""
+        self.assertIsNotNone(State.__doc__)
+
+
