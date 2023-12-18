@@ -135,4 +135,37 @@ class TestPlace(unittest.TestCase):
         self.assertTrue(list, type(reviews))
         self.assertIn(self.review, reviews)
 
+    @unittest.skipIf(type(models.storage) == DBStorage,
+                     "Testing DBStorage")
+    def test_amenities(self):
+        """Test amenities attribute."""
+        key = "{}.{}".format(type(self.amenity).__name__, self.amenity.id)
+        self.filestorage._FileStorage__objects[key] = self.amenity
+        self.place.amenities = self.amenity
+        amenities = self.place.amenities
+        self.assertTrue(list, type(amenities))
+        self.assertIn(self.amenity, amenities)
+
+    def test_is_subclass(self):
+        """Check that Place is a subclass of BaseModel."""
+        self.assertTrue(issubclass(Place, BaseModel))
+
+    def test_init(self):
+        """Test initialization."""
+        self.assertIsInstance(self.place, Place)
+
+    def test_two_models_are_unique(self):
+        """Test that different Place instances are unique."""
+        us = Place()
+        self.assertNotEqual(self.place.id, us.id)
+        self.assertLess(self.place.created_at, us.created_at)
+        self.assertLess(self.place.updated_at, us.updated_at)
+
+    def test_init_args_kwargs(self):
+        """Test initialization with args and kwargs."""
+        dt = datetime.utcnow()
+        st = Place("1", id="5", created_at=dt.isoformat())
+        self.assertEqual(st.id, "5")
+        self.assertEqual(st.created_at, dt)
+
 
