@@ -118,4 +118,46 @@ class TestUser(unittest.TestCase):
         self.assertEqual(st.id, "5")
         self.assertEqual(st.created_at, dt)
 
+    def test_str(self):
+        """Test __str__ representation."""
+        s = self.user.__str__()
+        self.assertIn("[User] ({})".format(self.user.id), s)
+        self.assertIn("'id': '{}'".format(self.user.id), s)
+        self.assertIn("'created_at': {}".format(
+            repr(self.user.created_at)), s)
+        self.assertIn("'updated_at': {}".format(
+            repr(self.user.updated_at)), s)
+        self.assertIn("'email': '{}'".format(self.user.email), s)
+        self.assertIn("'password': '{}'".format(self.user.password), s)
+
+    @unittest.skipIf(type(models.storage) == DBStorage,
+                     "Testing DBStorage")
+    def test_save_filestorage(self):
+        """Test save method with FileStorage."""
+        old = self.user.updated_at
+        self.user.save()
+        self.assertLess(old, self.user.updated_at)
+        with open("file.json", "r") as f:
+            self.assertIn("User." + self.user.id, f.read())
+
+    @unittest.skipIf(type(models.storage) == FileStorage,
+                     "Testing FileStorage")
+    def test_save_dbstorage(self):
+        """Test save method with DBStorage."""
+        old = self.user.updated_at
+        self.user.save()
+        self.assertLess(old, self.user.updated_at)
+        db = MySQLdb.connect(user="hbnb_test",
+                             passwd="hbnb_test_pwd",
+                             db="hbnb_test_db")
+        cursor = db.cursor()
+        cursor.execute("SELECT * \
+                          FROM `users` \
+                         WHERE BINARY email = '{}'".
+                       format(self.user.email))
+        query = cursor.fetchall()
+        self.assertEqual(1, len(query))
+        self.assertEqual(self.user.id, query[0][0])
+        cursor.close()
+
 
