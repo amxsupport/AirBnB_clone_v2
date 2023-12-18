@@ -191,4 +191,27 @@ class TestPlace(unittest.TestCase):
         with open("file.json", "r") as f:
             self.assertIn("Place." + self.place.id, f.read())
 
+    @unittest.skipIf(type(models.storage) == FileStorage,
+                     "Testing FileStorage")
+    def test_save_dbstorage(self):
+        """Test save method with DBStorage."""
+        old = self.place.updated_at
+        self.state.save()
+        self.city.save()
+        self.user.save()
+        self.place.save()
+        self.assertLess(old, self.place.updated_at)
+        db = MySQLdb.connect(user="hbnb_test",
+                             passwd="hbnb_test_pwd",
+                             db="hbnb_test_db")
+        cursor = db.cursor()
+        cursor.execute("SELECT * \
+                          FROM `places` \
+                         WHERE BINARY name = '{}'".
+                       format(self.place.name))
+        query = cursor.fetchall()
+        self.assertEqual(1, len(query))
+        self.assertEqual(self.place.id, query[0][0])
+        cursor.close()
+
 
