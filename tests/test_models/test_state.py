@@ -73,4 +73,35 @@ class TestState(unittest.TestCase):
         """Check for docstrings."""
         self.assertIsNotNone(State.__doc__)
 
+    def test_attributes(self):
+        """Check for attributes."""
+        st = State()
+        self.assertEqual(str, type(st.id))
+        self.assertEqual(datetime, type(st.created_at))
+        self.assertEqual(datetime, type(st.updated_at))
+        self.assertTrue(hasattr(st, "name"))
+
+    @unittest.skipIf(type(models.storage) == FileStorage,
+                     "Testing FileStorage")
+    def test_nullable_attributes(self):
+        """Check that relevant DBStorage attributes are non-nullable."""
+        with self.assertRaises(OperationalError):
+            self.dbstorage._DBStorage__session.add(State())
+            self.dbstorage._DBStorage__session.commit()
+        self.dbstorage._DBStorage__session.rollback()
+
+    @unittest.skipIf(type(models.storage) == DBStorage,
+                     "Testing DBStorage")
+    def test_cities(self):
+        """Test reviews attribute."""
+        key = "{}.{}".format(type(self.city).__name__, self.city.id)
+        self.filestorage._FileStorage__objects[key] = self.city
+        cities = self.state.cities
+        self.assertTrue(list, type(cities))
+        self.assertIn(self.city, cities)
+
+    def test_is_subclass(self):
+        """Check that State is a subclass of BaseModel."""
+        self.assertTrue(issubclass(State, BaseModel))
+
 
