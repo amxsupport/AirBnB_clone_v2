@@ -158,4 +158,28 @@ class TestReview(unittest.TestCase):
         with open("file.json", "r") as f:
             self.assertIn("Review." + self.review.id, f.read())
 
+    @unittest.skipIf(type(models.storage) == FileStorage,
+                     "Testing FileStorage")
+    def test_save_dbstorage(self):
+        """Test save method with DBStorage."""
+        old = self.review.updated_at
+        self.state.save()
+        self.city.save()
+        self.user.save()
+        self.place.save()
+        self.review.save()
+        self.assertLess(old, self.review.updated_at)
+        db = MySQLdb.connect(user="hbnb_test",
+                             passwd="hbnb_test_pwd",
+                             db="hbnb_test_db")
+        cursor = db.cursor()
+        cursor.execute("SELECT * \
+                          FROM `reviews` \
+                         WHERE BINARY text = '{}'".
+                       format(self.review.text))
+        query = cursor.fetchall()
+        self.assertEqual(1, len(query))
+        self.assertEqual(self.review.id, query[0][0])
+        cursor.close()
+
 
