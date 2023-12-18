@@ -154,3 +154,34 @@ class TestCity(unittest.TestCase):
         self.assertIn("'name': '{}'".format(self.city.name), s)
         self.assertIn("'state_id': '{}'".format(self.city.state_id), s)
 
+    @unittest.skipIf(type(models.storage) == DBStorage,
+                     "Testing DBStorage")
+    def test_save_filestorage(self):
+        """Test save method with FileStorage."""
+        old = self.city.updated_at
+        self.city.save()
+        self.assertLess(old, self.city.updated_at)
+        with open("file.json", "r") as f:
+            self.assertIn("City." + self.city.id, f.read())
+
+    @unittest.skipIf(type(models.storage) == FileStorage,
+                     "Testing FileStorage")
+    def test_save_dbstorage(self):
+        """Test save method with DBStorage."""
+        old = self.city.updated_at
+        self.state.save()
+        self.city.save()
+        self.assertLess(old, self.city.updated_at)
+        db = MySQLdb.connect(user="hbnb_test",
+                             passwd="hbnb_test_pwd",
+                             db="hbnb_test_db")
+        cursor = db.cursor()
+        cursor.execute("SELECT * \
+                          FROM `cities` \
+                         WHERE BINARY name = '{}'".
+                       format(self.city.name))
+        query = cursor.fetchall()
+        self.assertEqual(1, len(query))
+        self.assertEqual(self.city.id, query[0][0])
+        cursor.close()
+
