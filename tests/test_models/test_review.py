@@ -182,4 +182,20 @@ class TestReview(unittest.TestCase):
         self.assertEqual(self.review.id, query[0][0])
         cursor.close()
 
+    def test_to_dict(self):
+        """Test to_dict method."""
+        review_dict = self.review.to_dict()
+        self.assertEqual(dict, type(review_dict))
+        self.assertEqual(self.review.id, review_dict["id"])
+        self.assertEqual("Review", review_dict["__class__"])
+        self.assertEqual(self.review.created_at.isoformat(),
+                         review_dict["created_at"])
+        self.assertEqual(self.review.updated_at.isoformat(),
+                         review_dict["updated_at"])
+        self.assertEqual(self.review.text, review_dict["text"])
+        self.assertEqual(self.review.place_id, review_dict["place_id"])
+        self.assertEqual(self.review.user_id, review_dict["user_id"])
 
+
+if __name__ == "__main__":
+    unittest.main()
