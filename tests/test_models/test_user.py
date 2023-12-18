@@ -160,4 +160,19 @@ class TestUser(unittest.TestCase):
         self.assertEqual(self.user.id, query[0][0])
         cursor.close()
 
+    def test_to_dict(self):
+        """Test to_dict method."""
+        user_dict = self.user.to_dict()
+        self.assertEqual(dict, type(user_dict))
+        self.assertEqual(self.user.id, user_dict["id"])
+        self.assertEqual("User", user_dict["__class__"])
+        self.assertEqual(self.user.created_at.isoformat(),
+                         user_dict["created_at"])
+        self.assertEqual(self.user.updated_at.isoformat(),
+                         user_dict["updated_at"])
+        self.assertEqual(self.user.email, user_dict["email"])
+        self.assertEqual(self.user.password, user_dict["password"])
 
+
+if __name__ == "__main__":
+    unittest.main()
