@@ -1,19 +1,43 @@
 #!/usr/bin/python3
-""" """
-from tests.test_models.test_base_model import test_basemodel
+"""Defines unnittests for models/state.py."""
+import os
+import pep8
+import models
+import MySQLdb
+import unittest
+from datetime import datetime
+from models.base_model import Base, BaseModel
+from models.city import City
 from models.state import State
+from models.engine.db_storage import DBStorage
+from models.engine.file_storage import FileStorage
+from sqlalchemy.exc import OperationalError
+from sqlalchemy.orm import sessionmaker
 
 
-class test_state(test_basemodel):
-    """ """
+class TestState(unittest.TestCase):
+    """Unittests for testing the State class."""
 
-    def __init__(self, *args, **kwargs):
-        """ """
-        super().__init__(*args, **kwargs)
-        self.name = "State"
-        self.value = State
+    @classmethod
+    def setUpClass(cls):
+        """State testing setup.
 
-    def test_name3(self):
-        """ """
-        new = self.value()
-        self.assertEqual(type(new.name), str)
+        Temporarily renames any existing file.json.
+        Resets FileStorage objects dictionary.
+        Creates FileStorage, DBStorage and State instances for testing.
+        """
+        try:
+            os.rename("file.json", "tmp")
+        except IOError:
+            pass
+        FileStorage._FileStorage__objects = {}
+        cls.filestorage = FileStorage()
+        cls.state = State(name="California")
+        cls.city = City(name="San Jose", state_id=cls.state.id)
+
+        if type(models.storage) == DBStorage:
+            cls.dbstorage = DBStorage()
+            Base.metadata.create_all(cls.dbstorage._DBStorage__engine)
+            Session = sessionmaker(bind=cls.dbstorage._DBStorage__engine)
+            cls.dbstorage._DBStorage__session = Session()
+
